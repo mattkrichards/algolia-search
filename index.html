@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Algolia Search – fullP21items</title>
+
+  <!-- InstantSearch styles -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/instantsearch.css@8/themes/satellite-min.css" />
+
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: #f9f9f9; }
+    .wrap { padding: 16px; }
+    .layout { display: grid; grid-template-columns: 260px 1fr; gap: 16px; }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+    .hit { padding: 12px; border-radius: 10px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.05); margin-bottom: 10px; }
+    .hit small { color: #666; }
+    .ais-SearchBox-input { width: 100%; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Search box -->
+    <div id="searchbox"></div>
+
+    <div class="layout" style="margin-top:12px;">
+      <!-- Facets -->
+      <aside>
+        <h4>Suppliers</h4>
+        <div id="refinement-supplier"></div>
+
+        <h4 style="margin-top:16px;">Stockable</h4>
+        <div id="refinement-stockable"></div>
+      </aside>
+
+      <!-- Results -->
+      <main>
+        <div id="stats"></div>
+        <div id="hits" style="margin-top:8px;"></div>
+        <div id="pagination" style="margin-top:16px;"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Algolia libs -->
+  <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/instantsearch.js@4"></script>
+
+  <script>
+    // 🔁 Replace these with your values
+    const APP_ID = '5S0OBFIX7E';
+    const SEARCH_KEY = '764c708277b0c835667218af6eedfe21';
+    const INDEX_NAME = 'fullP21items';
+
+    const searchClient = algoliasearch(APP_ID, SEARCH_KEY);
+
+    const search = instantsearch({
+      indexName: INDEX_NAME,
+      searchClient,
+    });
+
+    const hitTemplate = (hit) => `
+      <article class="hit">
+        <div><small>${hit.item_id || ''}</small></div>
+        <h4 style="margin:4px 0 6px 0;">
+          ${instantsearch.highlight({ attribute: 'full_desc', hit })}
+        </h4>
+        <div style="color:#555;font-size:14px;">
+          Supplier: ${hit.supplier_name || ''} (ID: ${hit.supplier_id || ''})
+        </div>
+        <div style="margin-top:6px;font-size:13px;color:#333;">
+          Qty Avail: ${hit.qty_avail ?? '—'} | Stockable: ${hit.stockable ?? '—'}
+        </div>
+      </article>
+    `;
+
+    search.addWidgets([
+      instantsearch.widgets.searchBox({
+        container: '#searchbox',
+        placeholder: 'Search items…',
+        showReset: true,
+        showSubmit: true
+      }),
+      instantsearch.widgets.configure({
+        hitsPerPage: 12,
+        attributesToRetrieve: ['item_id','full_desc','supplier_name','supplier_id','qty_avail','stockable']
+      }),
+      instantsearch.widgets.refinementList({
+        container: '#refinement-supplier',
+        attribute: 'supplier_name',
+        searchable: true,
+        sortBy: ['name:asc']
+      }),
+      instantsearch.widgets.refinementList({
+        container: '#refinement-stockable',
+        attribute: 'stockable'
+      }),
+      instantsearch.widgets.stats({ container: '#stats' }),
+      instantsearch.widgets.hits({
+        container: '#hits',
+        templates: { item: hitTemplate },
+        escapeHTML: false
+      }),
+      instantsearch.widgets.pagination({ container: '#pagination' })
+    ]);
+
+    search.start();
+  </script>
+</body>
+</html>
