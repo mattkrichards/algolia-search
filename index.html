@@ -61,7 +61,7 @@
 
     const hitTemplate = (hit) => `
       <article class="hit">
-        <div><small>${hit.item_id || ''}</small></div>
+        <div><h3>${hit.item_id || ''}</h3></div>
         <h4 style="margin:4px 0 6px 0;">
           ${instantsearch.highlight({ attribute: 'full_desc', hit })}
         </h4>
@@ -71,6 +71,10 @@
         <div style="margin-top:6px;font-size:13px;color:#333;">
           Qty Avail: ${hit.qty_avail ?? '—'} | Stockable: ${hit.stockable ?? '—'}
         </div>
+        <div style="margin-top:6px;font-size:13px;color:#333;">
+          Stock Locs: ${hit.stockable_locs ?? '—'}}
+        </div>
+        
       </article>
     `;
 
@@ -83,7 +87,7 @@
       }),
       instantsearch.widgets.configure({
         hitsPerPage: 12,
-        attributesToRetrieve: ['item_id','full_desc','supplier_name','supplier_id','qty_avail','stockable']
+        attributesToRetrieve: ['item_id','full_desc','supplier_name','supplier_id','qty_avail','stockable','stockable_locs','price_family_desc']
       }),
       instantsearch.widgets.refinementList({
         container: '#refinement-supplier',
@@ -94,6 +98,14 @@
       instantsearch.widgets.refinementList({
         container: '#refinement-stockable',
         attribute: 'stockable'
+      }),
+      instantsearch.widgets.refinementList({
+        container: '#refinement-stockable_locs',
+        attribute: 'stockable_locs'
+      }),
+      instantsearch.widgets.refinementList({
+        container: '#refinement-price_fam',
+        attribute: 'price_family_desc'
       }),
       instantsearch.widgets.stats({ container: '#stats' }),
       instantsearch.widgets.hits({
@@ -108,3 +120,4 @@
   </script>
 </body>
 </html>
+
