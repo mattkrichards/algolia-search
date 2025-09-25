@@ -29,8 +29,11 @@
         <h4>Suppliers</h4>
         <div id="refinement-supplier"></div>
 
-        <h4 style="margin-top:16px;">Stockable</h4>
+        <h4 style="margin-top:16px;">Product Type</h4>
         <div id="refinement-stockable"></div>
+
+        <h4 style="margin-top:16px;">Qty Available</h4>
+        <div id="qty-range"></div>
       </aside>
 
       <!-- Results -->
@@ -61,15 +64,16 @@
 
     const hitTemplate = (hit) => `
       <article class="hit">
-        <div><h3>${hit.item_id || ''}</h3></div>
+        <div><h2>${hit.item_id || ''}</h2></div>
+        <h3>${instantsearch.highlight({ attribute: 'item_desc', hit })}</h3>
         <h4 style="margin:4px 0 6px 0;">
-          ${instantsearch.highlight({ attribute: 'full_desc', hit })}
+          ${instantsearch.highlight({ attribute: 'extended_desc', hit })}
         </h4>
         <div style="color:#555;font-size:14px;">
           Supplier: ${hit.supplier_name || ''} (ID: ${hit.supplier_id || ''})
         </div>
         <div style="margin-top:6px;font-size:13px;color:#333;">
-          Qty Avail: ${hit.qty_available ?? '—'} | Stockable: ${hit.stockable ?? '—'}
+          Product Type: ${hit.product_type ?? '—'} | Qty Avail: ${hit.qty_available ?? '—'} ${hit.category_end_node ?? '—'}  
         </div>
       </article>
     `;
@@ -83,7 +87,7 @@
       }),
       instantsearch.widgets.configure({
         hitsPerPage: 12,
-        attributesToRetrieve: ['item_id','full_desc','supplier_name','supplier_id','qty_avail','stockable']
+        attributesToRetrieve: ['item_id','item_desc',''extended_desc,'full_desc','supplier_name','supplier_id','qty_available','product_type','category_end_node']
       }),
       instantsearch.widgets.refinementList({
         container: '#refinement-supplier',
@@ -93,7 +97,11 @@
       }),
       instantsearch.widgets.refinementList({
         container: '#refinement-stockable',
-        attribute: 'stockable'
+        attribute: 'product_type'
+      }),
+      instantsearch.widgets.rangeInput({
+        container: '#qty-range',
+        attribute: 'qty_available'
       }),
       instantsearch.widgets.stats({ container: '#stats' }),
       instantsearch.widgets.hits({
@@ -108,4 +116,5 @@
   </script>
 </body>
 </html>
+
 
